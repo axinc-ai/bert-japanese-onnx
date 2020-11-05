@@ -82,6 +82,14 @@ python3 glue_export_onnx.py
 
 ### Inference using ONNX
 
+ONNX Runtime
+
 ```
 python3 glue_inference_onnx.py
+```
+
+ailia SDK
+
+```
+python3 glue_inference_ailia.py
 ```
