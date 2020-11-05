@@ -46,7 +46,7 @@ TSV file is separated by tab.
 - data/original/dev.tsv : Validation Data
 - data/original/test.tsv : Test Data
 
-## Train
+### Train
 
 We added below code to original transformers/run_glue.py.
 
@@ -66,7 +66,7 @@ Training script.
 python3 run_glue.py --data_dir ./data/original/ --model_name_or_path cl-tohoku/bert-base-japanese-whole-word-masking --task_name original --do_train --do_eval --output_dir output/original
 ```
 
-## Inference
+### Inference
 
 Inference script.
 
@@ -74,13 +74,13 @@ Inference script.
 python3 run_glue.py --data_dir ./data/original/ --model_name_or_path cl-tohoku/bert-base-japanese-whole-word-masking --task_name original --do_predict --output_dir output/original
 ```
 
-## Export to ONNX
+### Export to ONNX
 
 ```
 python3 glue_export_onnx.py
 ```
 
-## Inference using ONNX
+### Inference using ONNX
 
 ```
 python3 glue_inference_onnx.py
