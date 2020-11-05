@@ -1,13 +1,17 @@
 from transformers import pipeline
 from transformers import AutoModelWithLMHead, AutoTokenizer
 
+input_text = "Hugging Face is a technology company based in New York and Paris"
+
 # from pipeline
 translator = pipeline("translation_en_to_de")
-print(translator("Hugging Face is a technology company based in New York and Paris", max_length=40))
+output_text = translator(input_text, max_length=40)
+print("Translated : ",output_text)
 
-# from tokenizer
+# from tokenizer ( T5(Text-to-Text Transfer Transformer) )
 model = AutoModelWithLMHead.from_pretrained("t5-base")
 tokenizer = AutoTokenizer.from_pretrained("t5-base")
-inputs = tokenizer.encode("translate English to German: Hugging Face is a technology company based in New York and Paris", return_tensors="pt")
+inputs = tokenizer.encode(input_text, return_tensors="pt")
 outputs = model.generate(inputs, max_length=40, num_beams=4, early_stopping=True)
-print(outputs)
+output_text = tokenizer.decode(outputs[0])
+print("Translated : ",output_text)
