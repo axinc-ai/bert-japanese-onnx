@@ -7,6 +7,8 @@ from transformers.data.metrics import simple_accuracy
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 from transformers.file_utils import is_sklearn_available, requires_sklearn
 
+import os
+
 def classification_metrics(task_name, preds, labels):
     requires_sklearn(classification_metrics)
     assert len(preds) == len(labels), f"Predictions and labels have mismatched lengths {len(preds)} and {len(labels)}"

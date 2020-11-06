@@ -71,7 +71,7 @@ python3 run_glue.py --data_dir ./data/original/ --model_name_or_path cl-tohoku/b
 Inference script.
 
 ```
-python3 run_glue.py --data_dir ./data/original/ --model_name_or_path cl-tohoku/bert-base-japanese-whole-word-masking --task_name original --do_predict --output_dir output/original
+python3 run_glue.py --data_dir ./data/original/ --model_name_or_path output/original --task_name original --do_predict --output_dir output/original
 ```
 
 ### Export to ONNX
