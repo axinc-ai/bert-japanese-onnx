@@ -18,7 +18,7 @@ print("Masked text : ",tokenized_text)
 indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_text)
 print("Indexed tokens : ",indexed_tokens)
 
-cpu_model = InferenceSession("onnx/masklm/bert.onnx")
+cpu_model = InferenceSession("onnx/cl-tohoku/bert-base-japanese-whole-word-masking.onnx")
 
 token_type_ids = numpy.zeros((len(tokenized_text)))
 attention_mask = numpy.zeros((len(tokenized_text)))
