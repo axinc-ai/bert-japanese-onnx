@@ -2,6 +2,9 @@ import torch
 import numpy
 import argparse
 
+from transformers import BertTokenizer, BertJapaneseTokenizer, BertForMaskedLM
+from onnxruntime import InferenceSession, SessionOptions, get_all_providers
+
 MODEL_LISTS = [
     'bert-base-cased',
     'bert-base-uncased',
@@ -30,9 +33,6 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-from transformers import BertTokenizer, BertJapaneseTokenizer, BertForMaskedLM
-from onnxruntime import InferenceSession, SessionOptions, get_all_providers
-
 is_english = args.arch=='bert-base-cased' or args.arch=='bert-base-uncased'
 show_sudject = False
 
@@ -41,7 +41,12 @@ if is_english:
 else:
     tokenizer = BertJapaneseTokenizer.from_pretrained(args.arch)
 
-cpu_model = InferenceSession("onnx/"+args.arch)
+ailia_mode = False
+if ailia_mode:
+    import ailia
+    cpu_model = ailia.Net("onnx/cl-tohoku/bert-base-japanese-whole-word-masking.onnx.prototxt","onnx/cl-tohoku/bert-base-japanese-whole-word-masking.onnx")
+else:
+    cpu_model = InferenceSession("onnx/"+args.arch+".onnx")
 
 import codecs
 
@@ -67,15 +72,27 @@ for text in s:
         indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_text)
         #print("Indexed tokens : ",indexed_tokens)
 
-        token_type_ids = numpy.zeros((len(tokenized_text)))
-        attention_mask = numpy.zeros((len(tokenized_text)))
+        if ailia_mode:
+            indexed_tokens = numpy.expand_dims(numpy.array(indexed_tokens), axis=0)
+            token_type_ids = numpy.zeros((1,len(tokenized_text)))
+            attention_mask = numpy.zeros((1,len(tokenized_text)))
+        else:
+            indexed_tokens = [numpy.array(indexed_tokens)]
+            token_type_ids = [numpy.zeros((len(tokenized_text)))]
+            attention_mask = [numpy.zeros((len(tokenized_text)))]
 
-        inputs_onnx = {"token_type_ids":[token_type_ids],"input_ids":[indexed_tokens],"attention_mask":[attention_mask]}
+        inputs_onnx = {"token_type_ids":token_type_ids,"input_ids":indexed_tokens,"attention_mask":attention_mask}
 
         #print("Input : ",inputs_onnx)
 
         #print("Predicting...")
-        outputs = cpu_model.run(None, inputs_onnx)
+        if ailia_mode:
+            cpu_model.set_input_blob_shape(indexed_tokens.shape,cpu_model.find_blob_index_by_name("token_type_ids"))
+            cpu_model.set_input_blob_shape(indexed_tokens.shape,cpu_model.find_blob_index_by_name("input_ids"))
+            cpu_model.set_input_blob_shape(attention_mask.shape,cpu_model.find_blob_index_by_name("attention_mask"))
+            outputs = cpu_model.predict(inputs_onnx)
+        else:
+            outputs = cpu_model.run(None, inputs_onnx)
 
         #print("Output : ",outputs)
         def softmax(x):
